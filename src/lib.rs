@@ -1,6 +1,6 @@
-#![no_std]
+pub(crate) mod parse;
+pub mod wasm;
 
-/*
 #[cfg(test)]
 mod tests {
     #[test]
@@ -8,4 +8,3 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
-*/
