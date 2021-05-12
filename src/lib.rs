@@ -1,4 +1,4 @@
-pub(crate) mod parse;
+pub mod parse;
 pub mod wasm;
 
 #[cfg(test)]

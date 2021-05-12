@@ -16,18 +16,18 @@ where
     T::Error: std::fmt::Debug + std::fmt::Display + std::error::Error,
 {
     type Error = VecParseError<T::Error>;
-    fn parse(data: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
+    fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error> {
         let (value, len) =
             ULEB128::read_from(&data.get(0..).ok_or(VecParseError::VectorMalformed)?)
                 .or(Err(VecParseError::VectorMalformed))?;
         let mut result = Vec::new();
         let value = u64::from(value) as usize;
         result.reserve_exact(value);
-        let data = &data[len..];
-        for i in 0..value {
-            let (t, data) = T::parse(data)?;
+        *data = &data[len..];
+        for _ in 0..value {
+            let t = T::parse(data)?;
             result.push(t);
         }
-        Ok((result, data))
+        Ok(result)
     }
 }

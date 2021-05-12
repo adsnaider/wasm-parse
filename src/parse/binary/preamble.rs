@@ -9,7 +9,7 @@ pub enum Version {
 }
 
 pub struct Preamble {
-    version: Version,
+    pub version: Version,
 }
 
 #[derive(Debug, Error)]
@@ -24,8 +24,8 @@ pub enum ParseError {
 
 impl<'a> Parse<'a> for Preamble {
     type Error = ParseError;
-    fn parse(data: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
-        if data.len() != 8 {
+    fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error> {
+        if data.len() < 8 {
             return Err(ParseError::IncorrectHeaderFormat);
         }
         let magic = &data[0..4];
@@ -36,13 +36,11 @@ impl<'a> Parse<'a> for Preamble {
             });
         }
         let version = &data[4..8];
+        *data = &data[8..];
         return match version {
-            &[1, 0, 0, 0] => Ok((
-                Preamble {
-                    version: Version::V1_0_0_0,
-                },
-                &data[8..],
-            )),
+            &[1, 0, 0, 0] => Ok(Preamble {
+                version: Version::V1_0_0_0,
+            }),
             _ => Err(ParseError::UnsupportedVersion {
                 version: version.try_into().unwrap(),
             }),
