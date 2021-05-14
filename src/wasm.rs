@@ -1,0 +1,13 @@
+pub mod data;
+pub mod elem;
+pub mod export;
+pub mod expr;
+pub mod func;
+pub mod global;
+pub mod import;
+pub mod instr;
+pub mod mem;
+pub mod module;
+pub mod start;
+pub mod table;
+pub mod types;

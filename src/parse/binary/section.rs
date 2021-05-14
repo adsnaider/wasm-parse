@@ -4,15 +4,16 @@ use std::convert::TryInto;
 use thiserror::Error;
 
 mod code;
+mod custom;
 mod data;
 mod elem;
 mod export;
-mod functype;
 mod global;
 mod import;
 mod mem;
 mod start;
 mod table;
+mod types;
 
 #[derive(Debug, Error)]
 pub enum ParseError {

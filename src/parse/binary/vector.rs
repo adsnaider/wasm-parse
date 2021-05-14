@@ -13,7 +13,6 @@ pub enum VecParseError<E: std::fmt::Debug + std::fmt::Display + std::error::Erro
 impl<'a, T> Parse<'a> for Vec<T>
 where
     T: Parse<'a>,
-    T::Error: std::fmt::Debug + std::fmt::Display + std::error::Error,
 {
     type Error = VecParseError<T::Error>;
     fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error> {
