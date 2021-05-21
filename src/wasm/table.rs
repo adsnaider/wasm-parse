@@ -1,3 +1,6 @@
-// TODO
+use super::types::TableType;
+
 #[derive(Debug)]
-pub struct Table {}
+pub struct Table {
+    pub tpe: TableType,
+}

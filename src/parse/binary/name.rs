@@ -1,5 +1,4 @@
 use crate::parse::Parse;
-use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Name {

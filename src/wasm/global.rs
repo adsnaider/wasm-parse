@@ -2,6 +2,6 @@ use super::{expr::Expr, types::GlobalType};
 
 #[derive(Debug)]
 pub struct Global {
-    t: GlobalType,
-    init: Expr,
+    pub tpe: GlobalType,
+    pub init: Expr,
 }

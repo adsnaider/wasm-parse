@@ -1,54 +1,31 @@
 use thiserror::Error;
 
-pub mod name;
+pub mod global;
+pub mod indices;
+pub mod module;
 pub mod preamble;
-pub mod section;
+pub mod sections;
+pub mod types;
+pub mod values;
 pub mod vector;
 
-pub trait Parse<'a>: Sized {
-    type Error: std::error::Error + std::fmt::Display + std::fmt::Debug + 'static;
-    fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error>;
-    fn parse_into(&mut self, data: &mut &'a [u8]) -> Result<(), Self::Error> {
-        *self = Self::parse(data)?;
-        Ok(())
-    }
-}
-
-pub struct BinaryModule<'a> {
-    pub header: preamble::Preamble,
-    pub sections: Vec<section::Section<'a>>,
-}
-
 #[derive(Debug, Error)]
-pub enum ParseError {
-    #[error("Header error")]
-    HeaderError(#[from] preamble::ParseError),
-    #[error("Section error")]
-    SectionError(#[from] section::ParseError),
-    #[error("Couldn't read buffer: buffer too small for parsing")]
-    DataTooSmall,
-    #[error("Other parsing error: {0:?}")]
-    OtherError(#[from] Option<Box<dyn std::error::Error>>),
+#[error("Parse error: {}", reason)]
+pub struct ParseError {
+    reason: String,
 }
 
-impl<'a> Parse<'a> for BinaryModule<'a> {
-    type Error = ParseError;
-    fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error> {
-        let header = preamble::Preamble::parse(data)?;
-        let mut sections = Vec::new();
-        while !data.is_empty() {
-            sections.push(section::Section::parse(data)?);
-        }
-
-        Ok(BinaryModule { header, sections })
+impl ParseError {
+    pub fn new(reason: String) -> ParseError {
+        ParseError { reason }
     }
 }
 
-impl<'a> Parse<'a> for u8 {
-    type Error = ParseError;
-    fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error> {
-        let byte = data.get(0).ok_or(ParseError::DataTooSmall)?;
-        *data = &data[1..];
-        Ok(*byte)
+pub trait Parse: Sized {
+    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError>;
+    fn parse_into(&mut self, data: &[u8]) -> Result<usize, ParseError> {
+        let (value, len) = Self::parse(data)?;
+        *self = value;
+        Ok(len)
     }
 }

@@ -1,10 +1,7 @@
 use super::{data, elem, export, func, global, import, mem, start, table, types};
-use std::convert::TryFrom;
-use std::convert::TryInto;
-use thiserror::Error;
 
-use crate::parse::binary::section::SectionType;
-use crate::parse::binary::{self, Parse};
+use crate::parse::binary::sections::Section;
+use crate::parse::binary::Parse;
 
 #[derive(Debug)]
 pub struct Module {
@@ -37,80 +34,72 @@ impl Module {
     }
 }
 
-#[derive(Debug, Error)]
-pub enum ParseError {
-    #[error("Binary format error.")]
-    InvalidHeader(#[from] binary::ParseError),
-    #[error("Unknown parsing error: {0:?}")]
-    Other(Option<Box<dyn std::error::Error>>),
-}
+//impl<'a> Parse<'a> for Module {
+//type Error = ParseError;
+//fn parse(data: &mut &'a [u8]) -> Result<Self, Self::Error> {
+//let bin = binary::BinaryModule::parse(data)?;
+//bin.try_into().into()
+//}
+//}
 
-impl<'a> Parse<'a> for Module {
-    type Error = ParseError;
-    fn parse(data: &mut &'a [u8]) -> Result<Self, ParseError> {
-        let bin = binary::BinaryModule::parse(data)?;
-        bin.try_into().into()
-    }
-}
+//impl<'a> TryFrom<binary::BinaryModule<'a>> for Module {
+//type Error = ParseError;
 
-impl<'a> TryFrom<binary::BinaryModule<'a>> for Module {
-    type Error = ParseError;
-
-    fn try_from(value: binary::BinaryModule<'a>) -> Result<Self, Self::Error> {
-        let mut module = Module::new();
-        for mut section in value.sections {
-            match section.tpe {
-                SectionType::Type => module
-                    .types
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Import => module
-                    .imports
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Function => module
-                    .funcs
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Table => module
-                    .tables
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Memory => module
-                    .mems
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Global => module
-                    .globals
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Export => module
-                    .exports
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Start => module
-                    .start
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Element => module
-                    .elems
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Code => module
-                    .funcs
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::Data => module
-                    .datas
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                SectionType::DataCount => module
-                    .data_count
-                    .parse_into(&mut section.data)
-                    .map_err(|source| ParseError::Other(Some(source.into())))?,
-                _ => {}
-            }
-        }
-        Ok(module)
-    }
-}
+//fn try_from(value: binary::BinaryModule<'a>) -> Result<Self, Self::Error> {
+//let mut module = Module::new();
+//for mut section in value.sections {
+//match section.tpe {
+//Section::Type => module
+//.types
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Import => module
+//.imports
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Function => module
+//.funcs
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Table => module
+//.tables
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Memory => module
+//.mems
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Global => module
+//.globals
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Export => module
+//.exports
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Start => module
+//.start
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Element => module
+//.elems
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Code => module
+//.funcs
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::Data => module
+//.datas
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//Section::DataCount => module
+//.data_count
+//.parse_into(&mut section.data)
+//.map_err(|source| ParseError::Other(Some(source.into())))?,
+//_ => {}
+//}
+//}
+//Ok(module)
+//}
+//}
