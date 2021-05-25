@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Byte(pub u8);
 
@@ -11,7 +11,7 @@ impl Deref for Byte {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct U32(pub u32);
 
@@ -22,7 +22,7 @@ impl Deref for U32 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct U64(pub u64);
 
@@ -33,7 +33,7 @@ impl Deref for U64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct S32(pub i32);
 
@@ -44,7 +44,7 @@ impl Deref for S32 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct S64(pub i64);
 
@@ -55,7 +55,7 @@ impl Deref for S64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct I8(pub u8);
 
@@ -66,7 +66,7 @@ impl Deref for I8 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct I16(pub u16);
 
@@ -77,7 +77,7 @@ impl Deref for I16 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct I32(pub u32);
 
@@ -88,7 +88,7 @@ impl Deref for I32 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct I64(pub u64);
 
@@ -121,7 +121,7 @@ impl Deref for F32 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Name {
     pub name: String,
 }

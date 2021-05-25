@@ -11,3 +11,9 @@ impl Parse for Global {
         Ok(Global { tpe, init })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_parse_global() {}
+}

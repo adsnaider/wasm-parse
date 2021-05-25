@@ -1,6 +1,6 @@
 use super::values::U32;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum NumType {
     I32,
     I64,
@@ -8,59 +8,59 @@ pub enum NumType {
     F64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum RefType {
     FuncRef,
     ExternRef,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ValType {
     Num(NumType),
     Ref(RefType),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ResultType {
     pub types: Vec<ValType>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct FuncType {
     pub params: ResultType,
     pub result: ResultType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Limits {
     pub min: U32,
     pub max: Option<U32>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct MemType {
     pub lim: Limits,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct TableType {
     pub lim: Limits,
     pub tpe: RefType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct GlobalType {
     pub mutability: Mutability,
     pub tpe: ValType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Mutability {
     Const,
     Mut,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ExternType {
     Func(FuncType),
     Table(TableType),

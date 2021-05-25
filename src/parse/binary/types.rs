@@ -6,6 +6,15 @@ use crate::wasm::types::{
     ValType,
 };
 
+/// ```
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::NumType;
+/// let wasm: WasmBinary = [0x7F].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_eq!(NumType::parse(&mut wasm).unwrap(), NumType::I32);
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for NumType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
@@ -27,6 +36,15 @@ impl Parse for NumType {
     }
 }
 
+/// ```
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::RefType;
+/// let wasm: WasmBinary = [0x6F].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_eq!(RefType::parse(&mut wasm).unwrap(), RefType::ExternRef);
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for RefType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
@@ -46,6 +64,19 @@ impl Parse for RefType {
     }
 }
 
+/// ```
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::ValType;
+/// # use wasm_parse::wasm::types::RefType;
+/// let wasm: WasmBinary = [0x6F].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_eq!(
+///     ValType::parse(&mut wasm).unwrap(),
+///     ValType::Ref(RefType::ExternRef)
+/// );
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for ValType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
@@ -69,6 +100,17 @@ impl Parse for ValType {
     }
 }
 
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::ResultType;
+/// // 2 elements: ExternRef, F32
+/// let wasm: WasmBinary = [0x02, 0x6F, 0x7D].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(ResultType::parse(&mut wasm), Ok(ResultType { types }) if types.len() == 2);
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for ResultType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         let types = Vec::parse(data).map_err(|err| err.extend("Can't parse ValType"))?;
@@ -76,6 +118,17 @@ impl Parse for ResultType {
     }
 }
 
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::FuncType;
+/// // FuncType: ExternRef -> F32
+/// let wasm: WasmBinary = [0x60, 0x01, 0x6F, 0x01, 0x7D].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(FuncType::parse(&mut wasm), Ok(FuncType));
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for FuncType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
@@ -102,6 +155,23 @@ impl Parse for FuncType {
     }
 }
 
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::Limits;
+/// # use wasm_parse::wasm::values::U32;
+/// let wasm: WasmBinary = [0x01, 0x04, 0x05].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(
+///     Limits::parse(&mut wasm),
+///     Ok(Limits {
+///         min: U32(4),
+///         max: Some(U32(5))
+///     })
+/// );
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for Limits {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
@@ -127,6 +197,25 @@ impl Parse for Limits {
     }
 }
 
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::{Limits, MemType};
+/// # use wasm_parse::wasm::values::U32;
+/// let wasm: WasmBinary = [0x01, 0x04, 0x05].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(
+///     MemType::parse(&mut wasm),
+///     Ok(MemType {
+///         lim: Limits {
+///             min: U32(4),
+///             max: Some(U32(5))
+///         }
+///     })
+/// );
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for MemType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         let lim = Limits::parse(data).map_err(|err| err.extend("Can't parse limit"))?;
@@ -134,6 +223,26 @@ impl Parse for MemType {
     }
 }
 
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::{Limits, RefType, TableType};
+/// # use wasm_parse::wasm::values::U32;
+/// let wasm: WasmBinary = [0x70, 0x01, 0x04, 0x05].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(
+///     TableType::parse(&mut wasm),
+///     Ok(TableType {
+///         lim: Limits {
+///             min: U32(4),
+///             max: Some(U32(5))
+///         },
+///         tpe: RefType::FuncRef
+///     })
+/// );
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for TableType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         let tpe = RefType::parse(data).map_err(|err| err.extend("Can't parse RefType"))?;
@@ -142,6 +251,22 @@ impl Parse for TableType {
     }
 }
 
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::{GlobalType, Mutability, ValType, NumType};
+/// let wasm: WasmBinary = [0x7F, 0x00].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(
+///     GlobalType::parse(&mut wasm),
+///     Ok(GlobalType {
+///         tpe: ValType::Num(NumType::I32),
+///         mutability: Mutability::Const
+///     })
+/// );
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for GlobalType {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         let tpe = ValType::parse(data).map_err(|err| err.extend("Can't parse ValType."))?;
@@ -150,7 +275,16 @@ impl Parse for GlobalType {
         Ok(GlobalType { mutability, tpe })
     }
 }
-
+/// ```
+/// # #![feature(assert_matches)]
+/// # use wasm_parse::parse::binary::*;
+/// # use wasm_parse::wasm::types::Mutability;
+/// let wasm: WasmBinary = [0x00].as_ref().into();
+/// let mut wasm = ParsingData::new(&wasm);
+/// assert_matches!(Mutability::parse(&mut wasm), Ok(Mutability::Const));
+/// // We consumed the input.
+/// assert!(wasm.is_empty());
+/// ```
 impl Parse for Mutability {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {

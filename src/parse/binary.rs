@@ -69,6 +69,12 @@ impl From<Vec<u8>> for WasmBinary {
     }
 }
 
+impl From<&[u8]> for WasmBinary {
+    fn from(from: &[u8]) -> WasmBinary {
+        WasmBinary(from.into())
+    }
+}
+
 impl<'a> ParsingData<'a> {
     pub fn new(data: &'a WasmBinary) -> ParsingData<'a> {
         ParsingData {
