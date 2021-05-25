@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Consume, Parse, ParseError, ParsingData};
 use crate::wasm::values::Name;
 
 use crate::wasm::import::{Import, ImportDesc};
@@ -11,58 +11,52 @@ pub struct ImportSection {
 }
 
 impl Parse for ImportSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (imports, len) = Vec::parse(data)?;
-        Ok((ImportSection { imports }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let imports = Vec::parse(data)?;
+        Ok(ImportSection { imports })
     }
 }
 
 impl Parse for Import {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let mut length = 0;
-        let (module, len) = Name::parse(data)?;
-        length += len;
-        let (name, len) = Name::parse(&data[length..])?;
-        length += len;
-        let (desc, len) = ImportDesc::parse(&data[length..])?;
-        length += len;
-        Ok((Import { module, name, desc }, length))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let module = Name::parse(data)?;
+        let name = Name::parse(data)?;
+        let desc = ImportDesc::parse(data)?;
+        Ok(Import { module, name, desc })
     }
 }
 
 impl Parse for ImportDesc {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
             return Err(ParseError::new(
+                data,
                 "Invalid import description. Buffer too small.".to_string(),
             ));
         }
-        let mut length = 1;
-        let (desc, len) = match data[0] {
+        match data.consume(()) {
             0x00 => {
-                let (tpe, len) = TypeIdx::parse(&data[length..])?;
-                (ImportDesc::Func(tpe), len)
+                let tpe = TypeIdx::parse(data)?;
+                Ok(ImportDesc::Func(tpe))
             }
             0x01 => {
-                let (tpe, len) = TableType::parse(&data[length..])?;
-                (ImportDesc::Table(tpe), len)
+                let tpe = TableType::parse(data)?;
+                Ok(ImportDesc::Table(tpe))
             }
             0x02 => {
-                let (tpe, len) = MemType::parse(&data[length..])?;
-                (ImportDesc::Mem(tpe), len)
+                let tpe = MemType::parse(data)?;
+                Ok(ImportDesc::Mem(tpe))
             }
             0x03 => {
-                let (tpe, len) = GlobalType::parse(&data[length..])?;
-                (ImportDesc::Global(tpe), len)
+                let tpe = GlobalType::parse(data)?;
+                Ok(ImportDesc::Global(tpe))
             }
             x => {
-                return Err(ParseError::new(format!(
-                    "Invalid Import description value: {:X}",
-                    x
-                )))
+                return Err(ParseError::new(
+                    data,
+                    format!("Invalid Import description value: {:X}", x),
+                ))
             }
-        };
-        length += len;
-        Ok((desc, length))
+        }
     }
 }

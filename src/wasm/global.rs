@@ -1,4 +1,4 @@
-use super::{expr::Expr, types::GlobalType};
+use super::{instr::Expr, types::GlobalType};
 
 #[derive(Debug)]
 pub struct Global {

@@ -1,16 +1,13 @@
-use super::{Parse, ParseError};
+use super::{Parse, ParseError, ParsingData};
 
-use crate::wasm::expr::Expr;
 use crate::wasm::global::Global;
+use crate::wasm::instr::Expr;
 use crate::wasm::types::GlobalType;
 
 impl Parse for Global {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let mut length = 0;
-        let (tpe, len) = GlobalType::parse(data)?;
-        length += len;
-        let (init, len) = Expr::parse(&data[length..])?;
-        length += len;
-        Ok((Global { tpe, init }, length))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let tpe = GlobalType::parse(data).map_err(|err| err.extend("Can't parse global type"))?;
+        let init = Expr::parse(data).map_err(|err| err.extend("Can't parse init expression"))?;
+        Ok(Global { tpe, init })
     }
 }

@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Consume, Parse, ParseError, ParsingData};
 use crate::wasm::values::Name;
 
 #[derive(Debug)]
@@ -8,16 +8,12 @@ pub struct CustomSection {
 }
 
 impl Parse for CustomSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let mut length = 0;
-        let (name, len) = Name::parse(data)?;
-        length += len;
-        Ok((
-            CustomSection {
-                name: name,
-                data: data[length..].to_owned(),
-            },
-            data.len(),
-        ))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let name =
+            Name::parse(data).map_err(|err| err.extend("Can't parse custom section name"))?;
+        Ok(CustomSection {
+            name: name,
+            data: (*data.read(..)).to_owned(),
+        })
     }
 }

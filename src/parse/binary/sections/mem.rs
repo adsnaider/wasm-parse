@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::types::MemType;
 
 #[derive(Debug)]
@@ -7,8 +7,8 @@ pub struct MemSection {
 }
 
 impl Parse for MemSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (mems, len) = Vec::parse(data)?;
-        Ok((MemSection { mems }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let mems = Vec::parse(data)?;
+        Ok(MemSection { mems })
     }
 }

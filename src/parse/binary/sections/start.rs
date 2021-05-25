@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::indices::FuncIdx;
 use crate::wasm::start::Start;
 
@@ -8,15 +8,15 @@ pub struct StartSection {
 }
 
 impl Parse for StartSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (start, len) = Start::parse(data)?;
-        Ok((StartSection { start }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let start = Start::parse(data)?;
+        Ok(StartSection { start })
     }
 }
 
 impl Parse for Start {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (func, len) = FuncIdx::parse(data)?;
-        Ok((Start { func }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let func = FuncIdx::parse(data)?;
+        Ok(Start { func })
     }
 }

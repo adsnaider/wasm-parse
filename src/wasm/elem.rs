@@ -1,4 +1,4 @@
-use super::{expr::Expr, indices::TableIdx, types::RefType};
+use super::{indices::TableIdx, instr::Expr, types::RefType};
 
 #[derive(Debug)]
 pub struct Elem {

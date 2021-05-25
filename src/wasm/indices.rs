@@ -1,20 +1,20 @@
 use super::values::U32;
 
 #[derive(Debug)]
-pub struct TypeIdx(U32);
+pub struct TypeIdx(pub U32);
 #[derive(Debug)]
-pub struct FuncIdx(U32);
+pub struct FuncIdx(pub U32);
 #[derive(Debug)]
-pub struct TableIdx(U32);
+pub struct TableIdx(pub U32);
 #[derive(Debug)]
-pub struct MemIdx(U32);
+pub struct MemIdx(pub U32);
 #[derive(Debug)]
-pub struct GlobalIdx(U32);
+pub struct GlobalIdx(pub U32);
 #[derive(Debug)]
-pub struct ElemIdx(U32);
+pub struct ElemIdx(pub U32);
 #[derive(Debug)]
-pub struct DataIdx(U32);
+pub struct DataIdx(pub U32);
 #[derive(Debug)]
-pub struct LocalIdx(U32);
+pub struct LocalIdx(pub U32);
 #[derive(Debug)]
-pub struct LabelIdx(U32);
+pub struct LabelIdx(pub U32);

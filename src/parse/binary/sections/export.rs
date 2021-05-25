@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Consume, Parse, ParseError, ParsingData};
 use crate::wasm::export::{Export, ExportDesc};
 use crate::wasm::indices::{FuncIdx, GlobalIdx, MemIdx, TableIdx};
 use crate::wasm::values::Name;
@@ -9,48 +9,49 @@ pub struct ExportSection {
 }
 
 impl Parse for ExportSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (exports, len) = Vec::parse(data)?;
-        Ok((ExportSection { exports }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let exports = Vec::parse(data)?;
+        Ok(ExportSection { exports })
     }
 }
 
 impl Parse for Export {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let mut length = 0;
-        let (name, len) = Name::parse(data)?;
-        length += len;
-        let (desc, len) = ExportDesc::parse(&data[length..])?;
-        length += len;
-        Ok((Export { name, desc }, length))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let name = Name::parse(data)?;
+        let desc = ExportDesc::parse(data)?;
+        Ok(Export { name, desc })
     }
 }
 
 impl Parse for ExportDesc {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         if data.len() < 1 {
             return Err(ParseError::new(
+                data,
                 "Can't read export description. Buffer too small.".to_string(),
             ));
         }
-        let (desc, len) = match data[0] {
+        match data.consume(()) {
             0x00 => {
-                let (x, len) = FuncIdx::parse(data)?;
-                (ExportDesc::Func(x), len)
+                let x = FuncIdx::parse(data)?;
+                Ok(ExportDesc::Func(x))
             }
             0x01 => {
-                let (x, len) = TableIdx::parse(data)?;
-                (ExportDesc::Table(x), len)
+                let x = TableIdx::parse(data)?;
+                Ok(ExportDesc::Table(x))
             }
             0x02 => {
-                let (x, len) = MemIdx::parse(data)?;
-                (ExportDesc::Mem(x), len)
+                let x = MemIdx::parse(data)?;
+                Ok(ExportDesc::Mem(x))
             }
             0x03 => {
-                let (x, len) = GlobalIdx::parse(data)?;
-                (ExportDesc::Global(x), len)
+                let x = GlobalIdx::parse(data)?;
+                Ok(ExportDesc::Global(x))
             }
-        };
-        Ok((desc, len + 1))
+            x => Err(ParseError::new(
+                data,
+                format!("Unknown export description type {:X}", x),
+            )),
+        }
     }
 }

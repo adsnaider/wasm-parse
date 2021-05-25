@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::types::TableType;
 
 #[derive(Debug)]
@@ -7,8 +7,8 @@ pub struct TableSection {
 }
 
 impl Parse for TableSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (tables, len) = Vec::parse(data)?;
-        Ok((TableSection { tables }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let tables = Vec::parse(data)?;
+        Ok(TableSection { tables })
     }
 }

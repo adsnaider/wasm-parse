@@ -1,4 +1,4 @@
-use crate::parse::binary::{Parse, ParseError};
+use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::indices::TypeIdx;
 
 pub struct FuncSection {
@@ -6,8 +6,8 @@ pub struct FuncSection {
 }
 
 impl Parse for FuncSection {
-    fn parse(data: &[u8]) -> Result<(Self, usize), ParseError> {
-        let (funcs, len) = Vec::parse(data)?;
-        Ok((FuncSection { funcs }, len))
+    fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        let funcs = Vec::parse(data)?;
+        Ok(FuncSection { funcs })
     }
 }

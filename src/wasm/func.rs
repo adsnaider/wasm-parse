@@ -1,5 +1,5 @@
-use super::expr::Expr;
 use super::indices::TypeIdx;
+use super::instr::Expr;
 use super::types::ValType;
 
 #[derive(Debug)]

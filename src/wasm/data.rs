@@ -1,5 +1,5 @@
-use super::expr::Expr;
 use super::indices::MemIdx;
+use super::instr::Expr;
 
 #[derive(Debug)]
 pub struct Data {
