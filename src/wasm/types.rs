@@ -2,7 +2,7 @@
 
 use super::values::U32;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum NumType {
     I32,
     I64,
@@ -10,13 +10,13 @@ pub enum NumType {
     F64,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum RefType {
     FuncRef,
     ExternRef,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ValType {
     Num(NumType),
     Ref(RefType),

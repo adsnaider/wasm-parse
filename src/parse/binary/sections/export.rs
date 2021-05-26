@@ -5,7 +5,7 @@ use crate::wasm::values::Name;
 
 #[derive(Debug)]
 pub struct ExportSection {
-    exports: Vec<Export>,
+    pub exports: Vec<Export>,
 }
 
 impl Parse for ExportSection {

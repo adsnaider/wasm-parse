@@ -2,10 +2,11 @@
 
 use super::indices::MemIdx;
 use super::instr::Expr;
+use super::values::Byte;
 
 #[derive(Debug)]
 pub struct Data {
-    pub init: Vec<u8>,
+    pub init: Vec<Byte>,
     pub mode: DataMode,
 }
 

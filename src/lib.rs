@@ -7,13 +7,18 @@
 //! # Usage
 // TODO: Don't ignore once it compiles.
 //!
-//! ```no_run
+//! ```
+//! use std::fs;
+//!
 //! use wasm_parse::parse::{Parse, ParsingData, WasmBinary};
 //! use wasm_parse::wasm::module::Module;
 //!
-//! let bytes: WasmBinary = [0x01, 0x02, 0x03, 0x04].as_ref().into();
+//! let bytes: WasmBinary = fs::read("wasm-examples/foo.wasm")?.as_slice().into();
 //! let mut bytes = ParsingData::new(&bytes);
 //! let module = Module::parse(&mut bytes);
+//! assert!(module.is_ok(), "Error: {}", module.err().unwrap());
+//! assert!(bytes.is_empty());
+//! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 
 #![feature(assert_matches)]

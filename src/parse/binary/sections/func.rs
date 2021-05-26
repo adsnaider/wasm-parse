@@ -1,6 +1,7 @@
 use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::indices::TypeIdx;
 
+#[derive(Debug)]
 pub struct FuncSection {
     pub funcs: Vec<TypeIdx>,
 }

@@ -2,7 +2,7 @@
 
 use std::ops::Deref;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct Byte(pub u8);
 
@@ -13,7 +13,7 @@ impl Deref for Byte {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct U32(pub u32);
 
@@ -24,7 +24,7 @@ impl Deref for U32 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct U64(pub u64);
 
@@ -35,7 +35,7 @@ impl Deref for U64 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct S32(pub i32);
 
@@ -46,7 +46,7 @@ impl Deref for S32 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct S64(pub i64);
 
@@ -57,7 +57,7 @@ impl Deref for S64 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct I8(pub u8);
 
@@ -68,7 +68,7 @@ impl Deref for I8 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct I16(pub u16);
 
@@ -79,7 +79,7 @@ impl Deref for I16 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct I32(pub u32);
 
@@ -90,7 +90,7 @@ impl Deref for I32 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 #[repr(transparent)]
 pub struct I64(pub u64);
 
@@ -101,7 +101,7 @@ impl Deref for I64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct F64(pub f64);
 
@@ -112,7 +112,7 @@ impl Deref for F64 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
 pub struct F32(pub f32);
 
@@ -123,7 +123,7 @@ impl Deref for F32 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Name {
     pub name: String,
 }

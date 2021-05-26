@@ -8,7 +8,7 @@ use crate::wasm::types::RefType;
 
 #[derive(Debug)]
 pub struct ElemSection {
-    seg: Vec<Elem>,
+    pub seg: Vec<Elem>,
 }
 
 impl Parse for ElemSection {

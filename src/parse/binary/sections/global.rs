@@ -3,7 +3,7 @@ use crate::wasm::global::Global;
 
 #[derive(Debug)]
 pub struct GlobalSection {
-    globals: Vec<Global>,
+    pub globals: Vec<Global>,
 }
 
 impl Parse for GlobalSection {

@@ -4,13 +4,17 @@ use crate::wasm::start::Start;
 
 #[derive(Debug)]
 pub struct StartSection {
-    start: Start,
+    pub start: Option<Start>,
 }
 
 impl Parse for StartSection {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
-        let start = Start::parse(data)?;
-        Ok(StartSection { start })
+        if data.is_empty() {
+            Ok(StartSection { start: None })
+        } else {
+            let start = Start::parse(data)?;
+            Ok(StartSection { start: Some(start) })
+        }
     }
 }
 
