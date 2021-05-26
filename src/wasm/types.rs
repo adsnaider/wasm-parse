@@ -2,7 +2,7 @@
 
 use super::values::U32;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum NumType {
     I32,
     I64,
@@ -10,13 +10,13 @@ pub enum NumType {
     F64,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum RefType {
     FuncRef,
     ExternRef,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ValType {
     Num(NumType),
     Ref(RefType),
@@ -33,30 +33,30 @@ pub struct FuncType {
     pub result: ResultType,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct Limits {
     pub min: U32,
     pub max: Option<U32>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct MemType {
     pub lim: Limits,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct TableType {
     pub lim: Limits,
     pub tpe: RefType,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub struct GlobalType {
     pub mutability: Mutability,
     pub tpe: ValType,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Mutability {
     Const,
     Mut,
