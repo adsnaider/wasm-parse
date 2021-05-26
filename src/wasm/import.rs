@@ -1,3 +1,5 @@
+//! Web assembly import definition.
+
 use super::{
     indices::TypeIdx,
     types::{GlobalType, MemType, TableType},

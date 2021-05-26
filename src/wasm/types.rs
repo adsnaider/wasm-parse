@@ -1,3 +1,5 @@
+//! Web assembly types definitions.
+
 use super::values::U32;
 
 #[derive(Debug, PartialEq, Eq)]

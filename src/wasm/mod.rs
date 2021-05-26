@@ -1,3 +1,8 @@
+//! Wasm structure/model
+//!
+//! This module contains all the necessary definitions to define a web assembly module. The module
+//! is built through composition where larger structures contain the smaller structures.
+
 pub mod data;
 pub mod elem;
 pub mod export;

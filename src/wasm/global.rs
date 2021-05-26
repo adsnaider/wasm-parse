@@ -1,3 +1,5 @@
+//! Web assembly Global definition.
+
 use super::{instr::Expr, types::GlobalType};
 
 #[derive(Debug)]

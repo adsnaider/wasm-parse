@@ -1,3 +1,5 @@
+//! Web assembly table definition.
+
 use super::types::TableType;
 
 #[derive(Debug)]

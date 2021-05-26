@@ -1,3 +1,5 @@
+//! Web assembly data definition.
+
 use super::indices::MemIdx;
 use super::instr::Expr;
 

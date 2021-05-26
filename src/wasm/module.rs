@@ -1,3 +1,5 @@
+//! Web Assembly Module definition.
+
 use super::{data, elem, export, func, global, import, mem, start, table, types};
 
 #[derive(Debug)]

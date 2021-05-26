@@ -1,3 +1,5 @@
+//! Web assembly element definition.
+
 use super::{indices::TableIdx, instr::Expr, types::RefType};
 
 #[derive(Debug)]

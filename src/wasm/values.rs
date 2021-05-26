@@ -1,3 +1,5 @@
+//! Web assembly values definitions.
+
 use std::ops::Deref;
 
 #[derive(Debug, PartialEq, Eq)]

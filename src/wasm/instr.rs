@@ -1,3 +1,5 @@
+//! Web assembly instruction and expression definitions.
+
 #[derive(Debug)]
 pub enum Instr {
     Undefined,

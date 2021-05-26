@@ -1,3 +1,5 @@
+//! All web assembly indicies definitions.
+
 use super::values::U32;
 
 #[derive(Debug)]

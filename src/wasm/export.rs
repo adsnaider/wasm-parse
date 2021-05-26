@@ -1,3 +1,5 @@
+//! Web assembly export definition.
+
 use super::{
     indices::{FuncIdx, GlobalIdx, MemIdx, TableIdx},
     values::Name,
