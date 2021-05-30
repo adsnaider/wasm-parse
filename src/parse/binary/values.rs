@@ -2,25 +2,8 @@ use super::{Consume, Parse, ParseError, ParsingData};
 use nano_leb128::SLEB128;
 use nano_leb128::ULEB128;
 use std::convert::TryInto;
-use std::mem::transmute;
 
 use crate::wasm::values::{Byte, Name, F32, F64, I16, I32, I64, I8, S32, S64, U32, U64};
-
-// Unsafe explanation: Wasm uses the same representation of an unsigned int for all `In` types.
-fn to_unsinged_8(n: i8) -> u8 {
-    unsafe { transmute(n) }
-}
-
-fn to_unsinged_16(n: i16) -> u16 {
-    unsafe { transmute(n) }
-}
-fn to_unsinged_32(n: i32) -> u32 {
-    unsafe { transmute(n) }
-}
-
-fn to_unsinged_64(n: i64) -> u64 {
-    unsafe { transmute(n) }
-}
 
 impl Parse for Byte {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
@@ -87,7 +70,7 @@ impl Parse for I8 {
             "Conversion failure. Expected i8, got i64".to_string(),
         )))?;
         data.consume(len);
-        Ok(I8(to_unsinged_8(value)))
+        Ok(I8(value as u8))
     }
 }
 
@@ -100,7 +83,7 @@ impl Parse for I16 {
             "Conversion failure. Expected i16, got i64".to_string(),
         )))?;
         data.consume(len);
-        Ok(I16(to_unsinged_16(value)))
+        Ok(I16(value as u16))
     }
 }
 
@@ -115,7 +98,7 @@ impl Parse for I32 {
         )))?;
         println!("Total length: {}", len);
         data.consume(len);
-        Ok(I32(to_unsinged_32(value)))
+        Ok(I32(value as u32))
     }
 }
 
@@ -125,7 +108,7 @@ impl Parse for I64 {
             .or(Err(ParseError::new(data, "Can't decode i64".to_string())))?;
         let value: i64 = value.into();
         data.consume(len);
-        Ok(I64(to_unsinged_64(value)))
+        Ok(I64(value as u64))
     }
 }
 
