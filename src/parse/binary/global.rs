@@ -1,4 +1,4 @@
-use super::{Consume, Parse, ParseError, ParsingData};
+use super::{Parse, ParseError, ParsingData};
 
 use crate::wasm::global::Global;
 use crate::wasm::instr::Expr;
