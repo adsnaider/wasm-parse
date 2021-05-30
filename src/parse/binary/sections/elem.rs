@@ -1,12 +1,8 @@
 use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::elem::{Elem, ElemMode};
-//use crate::wasm::expr::Expr;
-//use crate::wasm::indices::FuncIdx;
-//use crate::wasm::indices::TableIdx;
 use crate::wasm::types::RefType;
-//use crate::wasm::values::U32;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ElemSection {
     pub seg: Vec<Elem>,
 }

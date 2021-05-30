@@ -5,7 +5,7 @@ use crate::wasm::instr::Expr;
 use crate::wasm::values::Byte;
 use crate::wasm::values::U32;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DataSection {
     pub data: Vec<Data>,
 }

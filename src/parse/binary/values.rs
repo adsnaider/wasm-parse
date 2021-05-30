@@ -106,12 +106,14 @@ impl Parse for I16 {
 
 impl Parse for I32 {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        println!("Decoding I32");
         let (value, len) = SLEB128::read_from(&data.read(..))
             .or(Err(ParseError::new(data, "Can't decode i32".to_string())))?;
         let value: i32 = i64::from(value).try_into().or(Err(ParseError::new(
             data,
             "Conversion failure. Expected i32, got i64".to_string(),
         )))?;
+        println!("Total length: {}", len);
         data.consume(len);
         Ok(I32(to_unsinged_32(value)))
     }
@@ -180,6 +182,7 @@ where
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
         let n = U32::parse(data).map_err(|err| err.extend("Couldn't read U32"))?;
         let mut result = Vec::with_capacity(*n as usize);
+        println!("Decoding vector: {:?}", n);
         for _ in 0..*n {
             let t = T::parse(data).map_err(|err| err.extend("Couldn't read data type."))?;
             result.push(t);

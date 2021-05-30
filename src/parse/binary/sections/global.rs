@@ -1,7 +1,7 @@
 use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::global::Global;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct GlobalSection {
     pub globals: Vec<Global>,
 }

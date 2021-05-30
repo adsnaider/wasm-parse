@@ -4,39 +4,39 @@ use crate::wasm::indices::{
     DataIdx, ElemIdx, FuncIdx, GlobalIdx, LabelIdx, LocalIdx, TableIdx, TypeIdx,
 };
 use crate::wasm::types::{RefType, ValType};
-use crate::wasm::values::U32;
+use crate::wasm::values::{F32, F64, I32, I64, U32};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum Instr {
-    Undefined,
     Numeric(NumericInstr),
     Reference(ReferenceInstr),
     Dropp,
-    Select(Option<ValType>),
+    Select(Vec<ValType>),
     Variable(VariableInstr),
     Table(TableInstr),
     Memory(MemoryInstr),
+    Control(ControlInstr),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum IntType {
     I32,
     I64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum FloatType {
     F32,
     F64,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, Clone)]
 pub enum Sign {
     Signed,
     Unsigned,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum VariableInstr {
     LocalGet(LocalIdx),
     LocalSet(LocalIdx),
@@ -45,7 +45,7 @@ pub enum VariableInstr {
     GlobalSet(GlobalIdx),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum TableInstr {
     TableGet(TableIdx),
     TableSet(TableIdx),
@@ -57,18 +57,18 @@ pub enum TableInstr {
     ElemDrop(ElemIdx),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct MemArg {
-    offset: U32,
-    align: U32,
+    pub offset: U32,
+    pub align: U32,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum MemoryInstr {
     ILoad(IntType, MemArg),
-    FLoad(IntType, MemArg),
+    FLoad(FloatType, MemArg),
     IStore(IntType, MemArg),
-    FStore(IntType, MemArg),
+    FStore(FloatType, MemArg),
     ILoad8(IntType, Sign, MemArg),
     ILoad16(IntType, Sign, MemArg),
     I64Load32(Sign, MemArg),
@@ -83,38 +83,54 @@ pub enum MemoryInstr {
     DataDrop(DataIdx),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum BlockType {
     Type(TypeIdx),
-    Val(Option<ValType>),
+    Val(ValType),
+    Empty,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
+pub struct Block {
+    pub tpe: BlockType,
+    pub instr: Vec<Instr>,
+}
+
+#[derive(Debug, Clone)]
+pub struct IfElseBlock {
+    pub tpe: BlockType,
+    pub if_br: Vec<Instr>,
+    pub else_br: Vec<Instr>,
+}
+
+#[derive(Debug, Clone)]
 pub enum ControlInstr {
     Nop,
     Unreachable,
-    Block(BlockType, Vec<Instr>),
-    Loop(BlockType, Vec<Instr>),
-    If(BlockType, Vec<Instr>, Option<Vec<Instr>>),
+    Block(Block),
+    Loop(Block),
+    If(IfElseBlock),
     Branch(LabelIdx),
     BranchIf(LabelIdx),
-    BrancTable(Vec<LabelIdx>),
+    BrancTable(Vec<LabelIdx>, LabelIdx),
     Return,
     Call(FuncIdx),
     CallIndirect(TableIdx, TypeIdx),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum ReferenceInstr {
     RefNull(RefType),
     RefIsNull,
     RefFunc(FuncIdx),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum NumericInstr {
-    IConst(IntType),
-    FConst(FloatType),
+    I32Const(I32),
+    I64Const(I64),
+    F32Const(F32),
+    F64Const(F64),
     IUnary(IntType, IUnop),
     FUnary(FloatType, FUnop),
     IBinary(IntType, IBinop),
@@ -128,7 +144,7 @@ pub enum NumericInstr {
     I32WrapI64,
     I64ExtendI32(Sign),
     ITruncF(IntType, FloatType, Sign),
-    ITrucSatF(IntType, FloatType, Sign),
+    ITruncSatF(IntType, FloatType, Sign),
     F32DemoteF64,
     F64PromoteF32,
     FConvertI(FloatType, IntType, Sign),
@@ -136,14 +152,14 @@ pub enum NumericInstr {
     FReinterpretI(FloatType, IntType),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum IUnop {
     Clz,
     Ctz,
     Popcnt,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum FUnop {
     Abs,
     Neg,
@@ -154,7 +170,7 @@ pub enum FUnop {
     Nearest,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum IBinop {
     Add,
     Sub,
@@ -170,7 +186,7 @@ pub enum IBinop {
     Rotr,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum FBinop {
     Add,
     Sub,
@@ -181,12 +197,12 @@ pub enum FBinop {
     CopySign,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum ITestop {
     Eqz,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum IRelop {
     Equ,
     Ne,
@@ -196,7 +212,7 @@ pub enum IRelop {
     Ge(Sign),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum FRelop {
     Equ,
     Ne,
@@ -206,7 +222,7 @@ pub enum FRelop {
     Ge,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Expr {
-    pub instructions: Vec<Instr>,
+    pub instr: Vec<Instr>,
 }

@@ -4,7 +4,7 @@ use crate::wasm::values::U32;
 
 use crate::parse::binary::{Consume, Parse, ParseError, ParsingData};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CodeSection {
     pub code: Vec<Func>,
 }

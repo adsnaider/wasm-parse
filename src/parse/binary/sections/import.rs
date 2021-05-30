@@ -5,7 +5,7 @@ use crate::wasm::import::{Import, ImportDesc};
 use crate::wasm::indices::TypeIdx;
 use crate::wasm::types::{GlobalType, MemType, TableType};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ImportSection {
     pub imports: Vec<Import>,
 }

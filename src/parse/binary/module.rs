@@ -3,6 +3,7 @@ use super::sections;
 use super::{Parse, ParseError, ParsingData};
 use crate::wasm::func::Func;
 use crate::wasm::module::Module;
+use crate::wasm::values::U32;
 use sections::{
     code::CodeSection, custom::CustomSection, data::DataSection, elem::ElemSection,
     export::ExportSection, func::FuncSection, global::GlobalSection, import::ImportSection,
@@ -42,10 +43,10 @@ impl BinaryModule {
         let mut elems: Option<ElemSection> = None;
         let mut code: Option<CodeSection> = None;
         let mut data: Option<DataSection> = None;
-
-        let mut data_count = None;
+        let mut data_count: Option<U32> = None;
 
         for section in sections {
+            println!("Got section: {:?}", section);
             match section {
                 Section::Custom(s) => custom.push(s),
                 Section::Type(s) => types = Some(s),
@@ -63,28 +64,28 @@ impl BinaryModule {
             }
         }
 
-        let data_count = *data_count.ok_or("Missing data count section")? as usize;
-
         let module = BinaryModule {
             header,
             custom,
-            types: types.ok_or("Missing type section")?,
-            imports: imports.ok_or("Missing imports section")?,
-            functions: functions.ok_or("Missing imports section")?,
-            tables: tables.ok_or("Missing imports section")?,
-            mems: mems.ok_or("Missing imports section")?,
-            globals: globals.ok_or("Missing imports section")?,
-            exports: exports.ok_or("Missing imports section")?,
-            start: start.ok_or("Missing imports section")?,
-            elems: elems.ok_or("Missing imports section")?,
-            code: code.ok_or("Missing imports section")?,
-            data: data.ok_or("Missing imports section")?,
+            types: types.unwrap_or_default(),
+            imports: imports.unwrap_or_default(),
+            functions: functions.unwrap_or_default(),
+            tables: tables.unwrap_or_default(),
+            mems: mems.unwrap_or_default(),
+            globals: globals.unwrap_or_default(),
+            exports: exports.unwrap_or_default(),
+            start: start.unwrap_or_default(),
+            elems: elems.unwrap_or_default(),
+            code: code.unwrap_or_default(),
+            data: data.unwrap_or_default(),
         };
 
-        if module.data.data.len() != data_count {
-            return Err(
-                "Malformed module. Data section should have a length equal to that of data_count.",
-            );
+        if let Some(len) = data_count {
+            if module.data.data.len() != *len as usize {
+                return Err(
+                    "Malformed module. Data section should have a length equal to that of data_count.",
+                );
+            }
         }
 
         if module.functions.funcs.len() != module.code.code.len() {

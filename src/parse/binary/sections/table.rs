@@ -2,7 +2,7 @@ use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::table::Table;
 use crate::wasm::types::TableType;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TableSection {
     pub tables: Vec<Table>,
 }

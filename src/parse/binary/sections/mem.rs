@@ -2,7 +2,7 @@ use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::mem::Mem;
 use crate::wasm::types::MemType;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct MemSection {
     pub mems: Vec<Mem>,
 }

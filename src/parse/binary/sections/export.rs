@@ -3,7 +3,7 @@ use crate::wasm::export::{Export, ExportDesc};
 use crate::wasm::indices::{FuncIdx, GlobalIdx, MemIdx, TableIdx};
 use crate::wasm::values::Name;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ExportSection {
     pub exports: Vec<Export>,
 }

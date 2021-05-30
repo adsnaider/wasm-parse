@@ -1,7 +1,7 @@
 use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::types::FuncType;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TypeSection {
     pub types: Vec<FuncType>,
 }

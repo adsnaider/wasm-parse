@@ -38,19 +38,58 @@ impl Parse for Section {
         let mut bytes = data.consume(size);
 
         Ok(match *n {
-            0 => Section::Custom(custom::CustomSection::parse(&mut bytes)?),
-            1 => Section::Type(types::TypeSection::parse(&mut bytes)?),
-            2 => Section::Import(import::ImportSection::parse(&mut bytes)?),
-            3 => Section::Function(func::FuncSection::parse(&mut bytes)?),
-            4 => Section::Table(table::TableSection::parse(&mut bytes)?),
-            5 => Section::Memory(mem::MemSection::parse(&mut bytes)?),
-            6 => Section::Global(global::GlobalSection::parse(&mut bytes)?),
-            7 => Section::Export(export::ExportSection::parse(&mut bytes)?),
-            8 => Section::Start(start::StartSection::parse(&mut bytes)?),
-            9 => Section::Element(elem::ElemSection::parse(&mut bytes)?),
-            10 => Section::Code(code::CodeSection::parse(&mut bytes)?),
-            11 => Section::Data(data::DataSection::parse(&mut bytes)?),
-            12 => Section::DataCount(U32::parse(&mut bytes)?),
+            0 => Section::Custom(
+                custom::CustomSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse custom section."))?,
+            ),
+            1 => Section::Type(
+                types::TypeSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse type section."))?,
+            ),
+            2 => Section::Import(
+                import::ImportSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse import section."))?,
+            ),
+            3 => Section::Function(
+                func::FuncSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse function section."))?,
+            ),
+            4 => Section::Table(
+                table::TableSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse table section."))?,
+            ),
+            5 => Section::Memory(
+                mem::MemSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse memory section."))?,
+            ),
+            6 => Section::Global(
+                global::GlobalSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse global section."))?,
+            ),
+            7 => Section::Export(
+                export::ExportSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse export section."))?,
+            ),
+            8 => Section::Start(
+                start::StartSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse start section."))?,
+            ),
+            9 => Section::Element(
+                elem::ElemSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse element section."))?,
+            ),
+            10 => Section::Code(
+                code::CodeSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse code section."))?,
+            ),
+            11 => Section::Data(
+                data::DataSection::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse data section."))?,
+            ),
+            12 => Section::DataCount(
+                U32::parse(&mut bytes)
+                    .map_err(|err| err.extend("Can't parse data count section."))?,
+            ),
             n => {
                 return Err(ParseError::new(
                     data,

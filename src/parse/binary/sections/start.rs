@@ -2,7 +2,7 @@ use crate::parse::binary::{Parse, ParseError, ParsingData};
 use crate::wasm::indices::FuncIdx;
 use crate::wasm::start::Start;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct StartSection {
     pub start: Option<Start>,
 }

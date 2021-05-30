@@ -5,7 +5,6 @@
 //! specification with many of the names being the same.
 //!
 //! # Usage
-// TODO: Don't ignore once it compiles.
 //!
 //! ```
 //! use std::fs;
@@ -13,7 +12,7 @@
 //! use wasm_parse::parse::{Parse, ParsingData, WasmBinary};
 //! use wasm_parse::wasm::module::Module;
 //!
-//! let bytes: WasmBinary = fs::read("wasm-examples/foo.wasm")?.as_slice().into();
+//! let bytes: WasmBinary = fs::read("wasm-examples/hello.wasm")?.as_slice().into();
 //! let mut bytes = ParsingData::new(&bytes);
 //! let module = Module::parse(&mut bytes);
 //! assert!(module.is_ok(), "Error: {}", module.err().unwrap());
