@@ -2,7 +2,7 @@
 
 use super::indices::FuncIdx;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Start {
     pub func: FuncIdx,
 }

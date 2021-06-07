@@ -22,12 +22,12 @@ pub enum ValType {
     Ref(RefType),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ResultType {
     pub types: Vec<ValType>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct FuncType {
     pub params: ResultType,
     pub result: ResultType,
@@ -62,7 +62,7 @@ pub enum Mutability {
     Mut,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ExternType {
     Func(FuncType),
     Table(TableType),

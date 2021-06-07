@@ -18,19 +18,19 @@ pub enum Instr {
     Control(ControlInstr),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum IntType {
-    I32,
-    I64,
+    I32 = 0,
+    I64 = 1,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum FloatType {
     F32,
     F64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Sign {
     Signed,
     Unsigned,
@@ -112,7 +112,7 @@ pub enum ControlInstr {
     If(IfElseBlock),
     Branch(LabelIdx),
     BranchIf(LabelIdx),
-    BrancTable(Vec<LabelIdx>, LabelIdx),
+    BranchTable(Vec<LabelIdx>, LabelIdx),
     Return,
     Call(FuncIdx),
     CallIndirect(TableIdx, TypeIdx),
@@ -131,36 +131,69 @@ pub enum NumericInstr {
     I64Const(I64),
     F32Const(F32),
     F64Const(F64),
-    IUnary(IntType, IUnop),
-    FUnary(FloatType, FUnop),
-    IBinary(IntType, IBinop),
-    FBinary(FloatType, FBinop),
-    ITest(IntType, ITestop),
-    IRelop(IntType, IRelop),
-    FRelop(FloatType, FRelop),
-    IExtend8S(IntType),
-    IExtend16S(IntType),
+    I32Unary(IUnop<{ IntType::I32 }>),
+    I64Unary(IUnop<{ IntType::I64 }>),
+    F32Unary(FUnop<{ FloatType::F32 }>),
+    F64Unary(FUnop<{ FloatType::F64 }>),
+    I32Binary(IBinop<{ IntType::I32 }>),
+    I64Binary(IBinop<{ IntType::I64 }>),
+    F32Binary(FBinop<{ FloatType::F32 }>),
+    F64Binary(FBinop<{ FloatType::F64 }>),
+    I32Test(ITestop<{ IntType::I32 }>),
+    I64Test(ITestop<{ IntType::I64 }>),
+    I32Relop(IRelop<{ IntType::I32 }>),
+    I64Relop(IRelop<{ IntType::I64 }>),
+    F32Relop(FRelop<{ FloatType::F32 }>),
+    F64Relop(FRelop<{ FloatType::F64 }>),
+    I32Extend8S,
+    I64Extend8S,
+    I32Extend16S,
+    I64Extend16S,
     I64Extend32S,
     I32WrapI64,
-    I64ExtendI32(Sign),
-    ITruncF(IntType, FloatType, Sign),
-    ITruncSatF(IntType, FloatType, Sign),
+    I64ExtendI32S,
+    I64ExtendI32U,
+    I32TruncF32S,
+    I32TruncF32U,
+    I64TruncF32S,
+    I64TruncF32U,
+    I32TruncF64S,
+    I32TruncF64U,
+    I64TruncF64S,
+    I64TruncF64U,
+    I32TruncSatF32S,
+    I32TruncSatF32U,
+    I32TruncSatF64S,
+    I32TruncSatF64U,
+    I64TruncSatF32S,
+    I64TruncSatF32U,
+    I64TruncSatF64S,
+    I64TruncSatF64U,
     F32DemoteF64,
     F64PromoteF32,
-    FConvertI(FloatType, IntType, Sign),
-    IReinterpretF(IntType, FloatType),
-    FReinterpretI(FloatType, IntType),
+    F32ConvertI32S,
+    F32ConvertI32U,
+    F32ConvertI64S,
+    F32ConvertI64U,
+    F64ConvertI32S,
+    F64ConvertI32U,
+    F64ConvertI64S,
+    F64ConvertI64U,
+    I32ReinterpretF32,
+    I64ReinterpretF64,
+    F32ReinterpretI32,
+    F64ReinterpretI64,
 }
 
 #[derive(Debug, Clone)]
-pub enum IUnop {
+pub enum IUnop<const T: IntType> {
     Clz,
     Ctz,
     Popcnt,
 }
 
 #[derive(Debug, Clone)]
-pub enum FUnop {
+pub enum FUnop<const T: FloatType> {
     Abs,
     Neg,
     Sqrt,
@@ -171,23 +204,26 @@ pub enum FUnop {
 }
 
 #[derive(Debug, Clone)]
-pub enum IBinop {
+pub enum IBinop<const T: IntType> {
     Add,
     Sub,
     Mul,
-    Div(Sign),
-    Rem(Sign),
+    DivS,
+    DivU,
+    RemS,
+    RemU,
     And,
     Or,
     Xor,
     Shl,
-    Shr(Sign),
+    ShrS,
+    ShrU,
     Rotl,
     Rotr,
 }
 
 #[derive(Debug, Clone)]
-pub enum FBinop {
+pub enum FBinop<const T: FloatType> {
     Add,
     Sub,
     Mul,
@@ -198,22 +234,26 @@ pub enum FBinop {
 }
 
 #[derive(Debug, Clone)]
-pub enum ITestop {
+pub enum ITestop<const T: IntType> {
     Eqz,
 }
 
 #[derive(Debug, Clone)]
-pub enum IRelop {
+pub enum IRelop<const T: IntType> {
     Equ,
     Ne,
-    Lt(Sign),
-    Gt(Sign),
-    Le(Sign),
-    Ge(Sign),
+    LtS,
+    LtU,
+    GtS,
+    GtU,
+    LeS,
+    LeU,
+    GeS,
+    GeU,
 }
 
 #[derive(Debug, Clone)]
-pub enum FRelop {
+pub enum FRelop<const T: FloatType> {
     Equ,
     Ne,
     Lt,

@@ -21,6 +21,7 @@
 //! ```
 
 #![feature(assert_matches)]
+#![feature(const_generics)]
 
 pub mod parse;
 pub mod wasm;

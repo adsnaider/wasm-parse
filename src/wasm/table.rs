@@ -2,7 +2,7 @@
 
 use super::types::TableType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Table {
     pub tpe: TableType,
 }

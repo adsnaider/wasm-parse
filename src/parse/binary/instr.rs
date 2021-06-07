@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use super::{Consume, Parse, ParseError, ParsingData};
 use crate::wasm::indices::{
     DataIdx, ElemIdx, FuncIdx, GlobalIdx, LabelIdx, LocalIdx, TableIdx, TypeIdx,
@@ -9,7 +11,6 @@ use crate::wasm::instr::{
 };
 use crate::wasm::types::{RefType, ValType};
 use crate::wasm::values::{F32, F64, I32, I64, S64, U32};
-use std::convert::TryInto;
 
 // TODO: This
 impl Parse for Instr {
@@ -31,7 +32,7 @@ impl Parse for Instr {
             0x0E => {
                 let labels = Vec::parse(data)?;
                 let label = LabelIdx::parse(data)?;
-                Instr::Control(ControlInstr::BrancTable(labels, label))
+                Instr::Control(ControlInstr::BranchTable(labels, label))
             }
             0x0F => Instr::Control(ControlInstr::Return),
             0x10 => Instr::Control(ControlInstr::Call(FuncIdx::parse(data)?)),
@@ -57,46 +58,14 @@ impl Parse for Instr {
                 let selector = *U32::parse(data)?;
                 match selector {
                     // Trunc saturated
-                    0 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I32,
-                        FloatType::F32,
-                        Sign::Signed,
-                    )),
-                    1 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I32,
-                        FloatType::F32,
-                        Sign::Unsigned,
-                    )),
-                    2 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I32,
-                        FloatType::F64,
-                        Sign::Signed,
-                    )),
-                    3 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I32,
-                        FloatType::F64,
-                        Sign::Unsigned,
-                    )),
-                    4 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I64,
-                        FloatType::F32,
-                        Sign::Signed,
-                    )),
-                    5 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I64,
-                        FloatType::F32,
-                        Sign::Unsigned,
-                    )),
-                    6 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I64,
-                        FloatType::F64,
-                        Sign::Signed,
-                    )),
-                    7 => Instr::Numeric(NumericInstr::ITruncSatF(
-                        IntType::I64,
-                        FloatType::F64,
-                        Sign::Unsigned,
-                    )),
+                    0 => Instr::Numeric(NumericInstr::I32TruncSatF32S),
+                    1 => Instr::Numeric(NumericInstr::I32TruncSatF32U),
+                    2 => Instr::Numeric(NumericInstr::I32TruncSatF64S),
+                    3 => Instr::Numeric(NumericInstr::I32TruncSatF64U),
+                    4 => Instr::Numeric(NumericInstr::I64TruncSatF32S),
+                    5 => Instr::Numeric(NumericInstr::I64TruncSatF32U),
+                    6 => Instr::Numeric(NumericInstr::I64TruncSatF64S),
+                    7 => Instr::Numeric(NumericInstr::I64TruncSatF64U),
 
                     // Mem instructions:
                     8 => {
@@ -236,263 +205,139 @@ impl Parse for Instr {
             0x42 => Instr::Numeric(NumericInstr::I64Const(I64::parse(data)?)),
             0x43 => Instr::Numeric(NumericInstr::F32Const(F32::parse(data)?)),
             0x44 => Instr::Numeric(NumericInstr::F64Const(F64::parse(data)?)),
-            0x45 => Instr::Numeric(NumericInstr::ITest(IntType::I32, ITestop::Eqz)),
-            0x46 => Instr::Numeric(NumericInstr::IRelop(IntType::I32, IRelop::Equ)),
-            0x47 => Instr::Numeric(NumericInstr::IRelop(IntType::I32, IRelop::Ne)),
-            0x48 => Instr::Numeric(NumericInstr::IRelop(IntType::I32, IRelop::Lt(Sign::Signed))),
-            0x49 => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I32,
-                IRelop::Lt(Sign::Unsigned),
-            )),
-            0x4A => Instr::Numeric(NumericInstr::IRelop(IntType::I32, IRelop::Gt(Sign::Signed))),
-            0x4B => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I32,
-                IRelop::Gt(Sign::Unsigned),
-            )),
-            0x4C => Instr::Numeric(NumericInstr::IRelop(IntType::I32, IRelop::Le(Sign::Signed))),
-            0x4D => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I32,
-                IRelop::Le(Sign::Unsigned),
-            )),
-            0x4E => Instr::Numeric(NumericInstr::IRelop(IntType::I32, IRelop::Ge(Sign::Signed))),
-            0x4F => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I32,
-                IRelop::Ge(Sign::Unsigned),
-            )),
-            0x50 => Instr::Numeric(NumericInstr::ITest(IntType::I64, ITestop::Eqz)),
-            0x51 => Instr::Numeric(NumericInstr::IRelop(IntType::I64, IRelop::Equ)),
-            0x52 => Instr::Numeric(NumericInstr::IRelop(IntType::I64, IRelop::Ne)),
-            0x53 => Instr::Numeric(NumericInstr::IRelop(IntType::I64, IRelop::Lt(Sign::Signed))),
-            0x54 => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I64,
-                IRelop::Lt(Sign::Unsigned),
-            )),
-            0x55 => Instr::Numeric(NumericInstr::IRelop(IntType::I64, IRelop::Gt(Sign::Signed))),
-            0x56 => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I64,
-                IRelop::Gt(Sign::Unsigned),
-            )),
-            0x57 => Instr::Numeric(NumericInstr::IRelop(IntType::I64, IRelop::Le(Sign::Signed))),
-            0x58 => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I64,
-                IRelop::Le(Sign::Unsigned),
-            )),
-            0x59 => Instr::Numeric(NumericInstr::IRelop(IntType::I64, IRelop::Ge(Sign::Signed))),
-            0x5A => Instr::Numeric(NumericInstr::IRelop(
-                IntType::I64,
-                IRelop::Ge(Sign::Unsigned),
-            )),
-            0x5B => Instr::Numeric(NumericInstr::FRelop(FloatType::F32, FRelop::Equ)),
-            0x5C => Instr::Numeric(NumericInstr::FRelop(FloatType::F32, FRelop::Ne)),
-            0x5D => Instr::Numeric(NumericInstr::FRelop(FloatType::F32, FRelop::Lt)),
-            0x5E => Instr::Numeric(NumericInstr::FRelop(FloatType::F32, FRelop::Gt)),
-            0x5F => Instr::Numeric(NumericInstr::FRelop(FloatType::F32, FRelop::Le)),
-            0x60 => Instr::Numeric(NumericInstr::FRelop(FloatType::F32, FRelop::Ge)),
-            0x61 => Instr::Numeric(NumericInstr::FRelop(FloatType::F64, FRelop::Equ)),
-            0x62 => Instr::Numeric(NumericInstr::FRelop(FloatType::F64, FRelop::Ne)),
-            0x63 => Instr::Numeric(NumericInstr::FRelop(FloatType::F64, FRelop::Lt)),
-            0x64 => Instr::Numeric(NumericInstr::FRelop(FloatType::F64, FRelop::Gt)),
-            0x65 => Instr::Numeric(NumericInstr::FRelop(FloatType::F64, FRelop::Le)),
-            0x66 => Instr::Numeric(NumericInstr::FRelop(FloatType::F64, FRelop::Ge)),
+            0x45 => Instr::Numeric(NumericInstr::I32Test(ITestop::Eqz)),
+            0x46 => Instr::Numeric(NumericInstr::I32Relop(IRelop::Equ)),
+            0x47 => Instr::Numeric(NumericInstr::I32Relop(IRelop::Ne)),
+            0x48 => Instr::Numeric(NumericInstr::I32Relop(IRelop::LtS)),
+            0x49 => Instr::Numeric(NumericInstr::I32Relop(IRelop::LtU)),
+            0x4A => Instr::Numeric(NumericInstr::I32Relop(IRelop::GtS)),
+            0x4B => Instr::Numeric(NumericInstr::I32Relop(IRelop::GtU)),
+            0x4C => Instr::Numeric(NumericInstr::I32Relop(IRelop::LeS)),
+            0x4D => Instr::Numeric(NumericInstr::I32Relop(IRelop::LeU)),
+            0x4E => Instr::Numeric(NumericInstr::I32Relop(IRelop::GeS)),
+            0x4F => Instr::Numeric(NumericInstr::I32Relop(IRelop::GeU)),
+            0x50 => Instr::Numeric(NumericInstr::I64Test(ITestop::Eqz)),
+            0x51 => Instr::Numeric(NumericInstr::I64Relop(IRelop::Equ)),
+            0x52 => Instr::Numeric(NumericInstr::I64Relop(IRelop::Ne)),
+            0x53 => Instr::Numeric(NumericInstr::I64Relop(IRelop::LtS)),
+            0x54 => Instr::Numeric(NumericInstr::I64Relop(IRelop::LtU)),
+            0x55 => Instr::Numeric(NumericInstr::I64Relop(IRelop::GtS)),
+            0x56 => Instr::Numeric(NumericInstr::I64Relop(IRelop::GtU)),
+            0x57 => Instr::Numeric(NumericInstr::I64Relop(IRelop::LeS)),
+            0x58 => Instr::Numeric(NumericInstr::I64Relop(IRelop::LeU)),
+            0x59 => Instr::Numeric(NumericInstr::I64Relop(IRelop::GeS)),
+            0x5A => Instr::Numeric(NumericInstr::I64Relop(IRelop::GeU)),
+            0x5B => Instr::Numeric(NumericInstr::F32Relop(FRelop::Equ)),
+            0x5C => Instr::Numeric(NumericInstr::F32Relop(FRelop::Ne)),
+            0x5D => Instr::Numeric(NumericInstr::F32Relop(FRelop::Lt)),
+            0x5E => Instr::Numeric(NumericInstr::F32Relop(FRelop::Gt)),
+            0x5F => Instr::Numeric(NumericInstr::F32Relop(FRelop::Le)),
+            0x60 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Ge)),
+            0x61 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Equ)),
+            0x62 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Ne)),
+            0x63 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Lt)),
+            0x64 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Gt)),
+            0x65 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Le)),
+            0x66 => Instr::Numeric(NumericInstr::F32Relop(FRelop::Ge)),
 
-            0x67 => Instr::Numeric(NumericInstr::IUnary(IntType::I32, IUnop::Clz)),
-            0x68 => Instr::Numeric(NumericInstr::IUnary(IntType::I32, IUnop::Ctz)),
-            0x69 => Instr::Numeric(NumericInstr::IUnary(IntType::I32, IUnop::Popcnt)),
-            0x6A => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Add)),
-            0x6B => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Sub)),
-            0x6C => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Mul)),
-            0x6D => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I32,
-                IBinop::Div(Sign::Signed),
-            )),
-            0x6E => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I32,
-                IBinop::Div(Sign::Unsigned),
-            )),
-            0x6F => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I32,
-                IBinop::Rem(Sign::Signed),
-            )),
-            0x70 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I32,
-                IBinop::Rem(Sign::Unsigned),
-            )),
-            0x71 => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::And)),
-            0x72 => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Or)),
-            0x73 => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Xor)),
-            0x74 => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Shl)),
-            0x75 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I32,
-                IBinop::Shr(Sign::Signed),
-            )),
-            0x76 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I32,
-                IBinop::Shr(Sign::Unsigned),
-            )),
-            0x77 => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Rotl)),
-            0x78 => Instr::Numeric(NumericInstr::IBinary(IntType::I32, IBinop::Rotr)),
+            0x67 => Instr::Numeric(NumericInstr::I32Unary(IUnop::Clz)),
+            0x68 => Instr::Numeric(NumericInstr::I32Unary(IUnop::Ctz)),
+            0x69 => Instr::Numeric(NumericInstr::I32Unary(IUnop::Popcnt)),
+            0x6A => Instr::Numeric(NumericInstr::I32Binary(IBinop::Add)),
+            0x6B => Instr::Numeric(NumericInstr::I32Binary(IBinop::Sub)),
+            0x6C => Instr::Numeric(NumericInstr::I32Binary(IBinop::Mul)),
+            0x6D => Instr::Numeric(NumericInstr::I32Binary(IBinop::DivS)),
+            0x6E => Instr::Numeric(NumericInstr::I32Binary(IBinop::DivU)),
+            0x6F => Instr::Numeric(NumericInstr::I32Binary(IBinop::RemS)),
+            0x70 => Instr::Numeric(NumericInstr::I32Binary(IBinop::RemU)),
+            0x71 => Instr::Numeric(NumericInstr::I32Binary(IBinop::And)),
+            0x72 => Instr::Numeric(NumericInstr::I32Binary(IBinop::Or)),
+            0x73 => Instr::Numeric(NumericInstr::I32Binary(IBinop::Xor)),
+            0x74 => Instr::Numeric(NumericInstr::I32Binary(IBinop::Shl)),
+            0x75 => Instr::Numeric(NumericInstr::I32Binary(IBinop::ShrS)),
+            0x76 => Instr::Numeric(NumericInstr::I32Binary(IBinop::ShrU)),
+            0x77 => Instr::Numeric(NumericInstr::I32Binary(IBinop::Rotl)),
+            0x78 => Instr::Numeric(NumericInstr::I32Binary(IBinop::Rotr)),
 
-            0x79 => Instr::Numeric(NumericInstr::IUnary(IntType::I64, IUnop::Clz)),
-            0x7A => Instr::Numeric(NumericInstr::IUnary(IntType::I64, IUnop::Ctz)),
-            0x7B => Instr::Numeric(NumericInstr::IUnary(IntType::I64, IUnop::Popcnt)),
-            0x7C => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Add)),
-            0x7D => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Sub)),
-            0x7E => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Mul)),
-            0x7F => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I64,
-                IBinop::Div(Sign::Signed),
-            )),
-            0x80 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I64,
-                IBinop::Div(Sign::Unsigned),
-            )),
-            0x81 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I64,
-                IBinop::Rem(Sign::Signed),
-            )),
-            0x82 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I64,
-                IBinop::Rem(Sign::Unsigned),
-            )),
-            0x83 => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::And)),
-            0x84 => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Or)),
-            0x85 => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Xor)),
-            0x86 => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Shl)),
-            0x87 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I64,
-                IBinop::Shr(Sign::Signed),
-            )),
-            0x88 => Instr::Numeric(NumericInstr::IBinary(
-                IntType::I64,
-                IBinop::Shr(Sign::Unsigned),
-            )),
-            0x89 => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Rotl)),
-            0x8A => Instr::Numeric(NumericInstr::IBinary(IntType::I64, IBinop::Rotr)),
+            0x79 => Instr::Numeric(NumericInstr::I64Unary(IUnop::Clz)),
+            0x7A => Instr::Numeric(NumericInstr::I64Unary(IUnop::Ctz)),
+            0x7B => Instr::Numeric(NumericInstr::I64Unary(IUnop::Popcnt)),
+            0x7C => Instr::Numeric(NumericInstr::I64Binary(IBinop::Add)),
+            0x7D => Instr::Numeric(NumericInstr::I64Binary(IBinop::Sub)),
+            0x7E => Instr::Numeric(NumericInstr::I64Binary(IBinop::Mul)),
+            0x7F => Instr::Numeric(NumericInstr::I64Binary(IBinop::DivS)),
+            0x80 => Instr::Numeric(NumericInstr::I64Binary(IBinop::DivU)),
+            0x81 => Instr::Numeric(NumericInstr::I64Binary(IBinop::RemS)),
+            0x82 => Instr::Numeric(NumericInstr::I64Binary(IBinop::RemU)),
+            0x83 => Instr::Numeric(NumericInstr::I64Binary(IBinop::And)),
+            0x84 => Instr::Numeric(NumericInstr::I64Binary(IBinop::Or)),
+            0x85 => Instr::Numeric(NumericInstr::I64Binary(IBinop::Xor)),
+            0x86 => Instr::Numeric(NumericInstr::I64Binary(IBinop::Shl)),
+            0x87 => Instr::Numeric(NumericInstr::I64Binary(IBinop::ShrS)),
+            0x88 => Instr::Numeric(NumericInstr::I64Binary(IBinop::ShrU)),
+            0x89 => Instr::Numeric(NumericInstr::I64Binary(IBinop::Rotl)),
+            0x8A => Instr::Numeric(NumericInstr::I64Binary(IBinop::Rotr)),
 
-            0x8B => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Abs)),
-            0x8C => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Neg)),
-            0x8D => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Ceil)),
-            0x8E => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Floor)),
-            0x8F => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Trunc)),
-            0x90 => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Nearest)),
-            0x91 => Instr::Numeric(NumericInstr::FUnary(FloatType::F32, FUnop::Sqrt)),
-            0x92 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::Add)),
-            0x93 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::Sub)),
-            0x94 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::Mul)),
-            0x95 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::Div)),
-            0x96 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::Min)),
-            0x97 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::Max)),
-            0x98 => Instr::Numeric(NumericInstr::FBinary(FloatType::F32, FBinop::CopySign)),
+            0x8B => Instr::Numeric(NumericInstr::F32Unary(FUnop::Abs)),
+            0x8C => Instr::Numeric(NumericInstr::F32Unary(FUnop::Neg)),
+            0x8D => Instr::Numeric(NumericInstr::F32Unary(FUnop::Ceil)),
+            0x8E => Instr::Numeric(NumericInstr::F32Unary(FUnop::Floor)),
+            0x8F => Instr::Numeric(NumericInstr::F32Unary(FUnop::Trunc)),
+            0x90 => Instr::Numeric(NumericInstr::F32Unary(FUnop::Nearest)),
+            0x91 => Instr::Numeric(NumericInstr::F32Unary(FUnop::Sqrt)),
+            0x92 => Instr::Numeric(NumericInstr::F32Binary(FBinop::Add)),
+            0x93 => Instr::Numeric(NumericInstr::F32Binary(FBinop::Sub)),
+            0x94 => Instr::Numeric(NumericInstr::F32Binary(FBinop::Mul)),
+            0x95 => Instr::Numeric(NumericInstr::F32Binary(FBinop::Div)),
+            0x96 => Instr::Numeric(NumericInstr::F32Binary(FBinop::Min)),
+            0x97 => Instr::Numeric(NumericInstr::F32Binary(FBinop::Max)),
+            0x98 => Instr::Numeric(NumericInstr::F32Binary(FBinop::CopySign)),
 
-            0x99 => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Abs)),
-            0x9A => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Neg)),
-            0x9B => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Ceil)),
-            0x9C => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Floor)),
-            0x9D => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Trunc)),
-            0x9E => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Nearest)),
-            0x9F => Instr::Numeric(NumericInstr::FUnary(FloatType::F64, FUnop::Sqrt)),
-            0xA0 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::Add)),
-            0xA1 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::Sub)),
-            0xA2 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::Mul)),
-            0xA3 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::Div)),
-            0xA4 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::Min)),
-            0xA5 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::Max)),
-            0xA6 => Instr::Numeric(NumericInstr::FBinary(FloatType::F64, FBinop::CopySign)),
+            0x99 => Instr::Numeric(NumericInstr::F64Unary(FUnop::Abs)),
+            0x9A => Instr::Numeric(NumericInstr::F64Unary(FUnop::Neg)),
+            0x9B => Instr::Numeric(NumericInstr::F64Unary(FUnop::Ceil)),
+            0x9C => Instr::Numeric(NumericInstr::F64Unary(FUnop::Floor)),
+            0x9D => Instr::Numeric(NumericInstr::F64Unary(FUnop::Trunc)),
+            0x9E => Instr::Numeric(NumericInstr::F64Unary(FUnop::Nearest)),
+            0x9F => Instr::Numeric(NumericInstr::F64Unary(FUnop::Sqrt)),
+            0xA0 => Instr::Numeric(NumericInstr::F64Binary(FBinop::Add)),
+            0xA1 => Instr::Numeric(NumericInstr::F64Binary(FBinop::Sub)),
+            0xA2 => Instr::Numeric(NumericInstr::F64Binary(FBinop::Mul)),
+            0xA3 => Instr::Numeric(NumericInstr::F64Binary(FBinop::Div)),
+            0xA4 => Instr::Numeric(NumericInstr::F64Binary(FBinop::Min)),
+            0xA5 => Instr::Numeric(NumericInstr::F64Binary(FBinop::Max)),
+            0xA6 => Instr::Numeric(NumericInstr::F64Binary(FBinop::CopySign)),
 
             0xA7 => Instr::Numeric(NumericInstr::I32WrapI64),
-            0xA8 => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I32,
-                FloatType::F32,
-                Sign::Signed,
-            )),
-            0xA9 => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I32,
-                FloatType::F32,
-                Sign::Unsigned,
-            )),
-            0xAA => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I32,
-                FloatType::F64,
-                Sign::Signed,
-            )),
-            0xAB => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I32,
-                FloatType::F64,
-                Sign::Unsigned,
-            )),
-            0xAC => Instr::Numeric(NumericInstr::I64ExtendI32(Sign::Signed)),
-            0xAD => Instr::Numeric(NumericInstr::I64ExtendI32(Sign::Unsigned)),
-            0xAE => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I64,
-                FloatType::F32,
-                Sign::Signed,
-            )),
-            0xAF => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I64,
-                FloatType::F32,
-                Sign::Unsigned,
-            )),
-            0xB0 => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I64,
-                FloatType::F64,
-                Sign::Signed,
-            )),
-            0xB1 => Instr::Numeric(NumericInstr::ITruncF(
-                IntType::I64,
-                FloatType::F64,
-                Sign::Unsigned,
-            )),
-            0xB2 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F32,
-                IntType::I32,
-                Sign::Signed,
-            )),
-            0xB3 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F32,
-                IntType::I32,
-                Sign::Unsigned,
-            )),
-            0xB4 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F32,
-                IntType::I64,
-                Sign::Signed,
-            )),
-            0xB5 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F32,
-                IntType::I64,
-                Sign::Unsigned,
-            )),
+            0xA8 => Instr::Numeric(NumericInstr::I32TruncF32S),
+            0xA9 => Instr::Numeric(NumericInstr::I32TruncF32U),
+            0xAA => Instr::Numeric(NumericInstr::I32TruncF64S),
+            0xAB => Instr::Numeric(NumericInstr::I32TruncF64U),
+            0xAC => Instr::Numeric(NumericInstr::I64ExtendI32S),
+            0xAD => Instr::Numeric(NumericInstr::I64ExtendI32U),
+            0xAE => Instr::Numeric(NumericInstr::I64TruncF32S),
+            0xAF => Instr::Numeric(NumericInstr::I64TruncF32U),
+            0xB0 => Instr::Numeric(NumericInstr::I64TruncF64S),
+            0xB1 => Instr::Numeric(NumericInstr::I64TruncF64U),
+            0xB2 => Instr::Numeric(NumericInstr::F32ConvertI32S),
+            0xB3 => Instr::Numeric(NumericInstr::F32ConvertI32U),
+            0xB4 => Instr::Numeric(NumericInstr::F32ConvertI64S),
+            0xB5 => Instr::Numeric(NumericInstr::F32ConvertI64U),
             0xB6 => Instr::Numeric(NumericInstr::F32DemoteF64),
-            0xB7 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F64,
-                IntType::I32,
-                Sign::Signed,
-            )),
-            0xB8 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F64,
-                IntType::I32,
-                Sign::Unsigned,
-            )),
-            0xB9 => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F64,
-                IntType::I64,
-                Sign::Signed,
-            )),
-            0xBA => Instr::Numeric(NumericInstr::FConvertI(
-                FloatType::F64,
-                IntType::I64,
-                Sign::Unsigned,
-            )),
+            0xB7 => Instr::Numeric(NumericInstr::F64ConvertI32S),
+            0xB8 => Instr::Numeric(NumericInstr::F64ConvertI32U),
+            0xB9 => Instr::Numeric(NumericInstr::F64ConvertI64S),
+            0xBA => Instr::Numeric(NumericInstr::F64ConvertI64U),
             0xBB => Instr::Numeric(NumericInstr::F64PromoteF32),
-            0xBC => Instr::Numeric(NumericInstr::IReinterpretF(IntType::I32, FloatType::F32)),
-            0xBD => Instr::Numeric(NumericInstr::IReinterpretF(IntType::I64, FloatType::F64)),
-            0xBE => Instr::Numeric(NumericInstr::FReinterpretI(FloatType::F32, IntType::I32)),
-            0xBF => Instr::Numeric(NumericInstr::FReinterpretI(FloatType::F64, IntType::I64)),
+            0xBC => Instr::Numeric(NumericInstr::I32ReinterpretF32),
+            0xBD => Instr::Numeric(NumericInstr::I64ReinterpretF64),
+            0xBE => Instr::Numeric(NumericInstr::F32ReinterpretI32),
+            0xBF => Instr::Numeric(NumericInstr::F64ReinterpretI64),
 
-            0xC0 => Instr::Numeric(NumericInstr::IExtend8S(IntType::I32)),
-            0xC1 => Instr::Numeric(NumericInstr::IExtend16S(IntType::I32)),
-            0xC2 => Instr::Numeric(NumericInstr::IExtend8S(IntType::I64)),
-            0xC3 => Instr::Numeric(NumericInstr::IExtend16S(IntType::I64)),
+            0xC0 => Instr::Numeric(NumericInstr::I32Extend8S),
+            0xC1 => Instr::Numeric(NumericInstr::I32Extend16S),
+            0xC2 => Instr::Numeric(NumericInstr::I64Extend8S),
+            0xC3 => Instr::Numeric(NumericInstr::I64Extend16S),
             0xC4 => Instr::Numeric(NumericInstr::I64Extend32S),
 
             x => {
@@ -541,12 +386,14 @@ impl Parse for Block {
 
 impl Parse for IfElseBlock {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
+        println!("Parsing if else");
         let tpe = BlockType::parse(data)?;
         let mut if_br = Vec::new();
         let mut else_br = Vec::new();
         loop {
             match data.read(()) {
                 0x0B => {
+                    println!("Finished with if");
                     data.consume(());
                     return Ok(IfElseBlock {
                         tpe,
@@ -555,11 +402,13 @@ impl Parse for IfElseBlock {
                     });
                 }
                 0x05 => {
+                    println!("Found else");
                     data.consume(());
                     break;
                 }
                 _ => {
                     if_br.push(Instr::parse(data)?);
+                    println!("Consuming instr: {:?}", if_br.last());
                 }
             }
         }
@@ -567,6 +416,7 @@ impl Parse for IfElseBlock {
         loop {
             match data.read(()) {
                 0x0B => {
+                    println!("Finished with else");
                     data.consume(());
                     return Ok(IfElseBlock {
                         tpe,
@@ -576,6 +426,7 @@ impl Parse for IfElseBlock {
                 }
                 _ => {
                     else_br.push(Instr::parse(data)?);
+                    println!("Consuming instr: {:?}", else_br.last());
                 }
             }
         }
@@ -589,10 +440,7 @@ impl Parse for BlockType {
                 data.consume(());
                 BlockType::Empty
             }
-            0x7C..=0x7F | 0x6F | 0x70 => {
-                data.consume(());
-                BlockType::Val(ValType::parse(data)?)
-            }
+            0x7C..=0x7F | 0x6F | 0x70 => BlockType::Val(ValType::parse(data)?),
             _ => {
                 let val = *S64::parse(data)?;
                 let val: u32 = val.try_into().or(Err(ParseError::new(

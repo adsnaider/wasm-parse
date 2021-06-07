@@ -6,14 +6,14 @@ use super::{
     values::Name,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Import {
     pub module: Name,
     pub name: Name,
     pub desc: ImportDesc,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ImportDesc {
     Func(TypeIdx),
     Table(TableType),

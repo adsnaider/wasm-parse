@@ -1,14 +1,15 @@
+use sections::{
+    code::CodeSection, custom::CustomSection, data::DataSection, elem::ElemSection,
+    export::ExportSection, func::FuncSection, global::GlobalSection, import::ImportSection,
+    mem::MemSection, start::StartSection, table::TableSection, types::TypeSection, Section,
+};
+
 use super::preamble;
 use super::sections;
 use super::{Parse, ParseError, ParsingData};
 use crate::wasm::func::Func;
 use crate::wasm::module::Module;
 use crate::wasm::values::U32;
-use sections::{
-    code::CodeSection, custom::CustomSection, data::DataSection, elem::ElemSection,
-    export::ExportSection, func::FuncSection, global::GlobalSection, import::ImportSection,
-    mem::MemSection, start::StartSection, table::TableSection, types::TypeSection, Section,
-};
 
 pub struct BinaryModule {
     pub header: preamble::Preamble,
@@ -46,7 +47,6 @@ impl BinaryModule {
         let mut data_count: Option<U32> = None;
 
         for section in sections {
-            println!("Got section: {:?}", section);
             match section {
                 Section::Custom(s) => custom.push(s),
                 Section::Type(s) => types = Some(s),
@@ -141,6 +141,7 @@ impl From<BinaryModule> for Module {
             start: from.start.start,
             imports: from.imports.imports,
             exports: from.exports.exports,
+            name: None,
         }
     }
 }

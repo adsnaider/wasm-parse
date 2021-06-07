@@ -1,8 +1,10 @@
 //! Web Assembly Module definition.
 
 use super::{data, elem, export, func, global, import, mem, start, table, types};
+use crate::parse::binary::{Parse, ParsingData, WasmBinary};
+use crate::wasm::values::Name;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub struct Module {
     pub types: Vec<types::FuncType>,
     pub funcs: Vec<func::Func>,
@@ -14,21 +16,13 @@ pub struct Module {
     pub start: Option<start::Start>,
     pub imports: Vec<import::Import>,
     pub exports: Vec<export::Export>,
+    pub name: Option<Name>,
 }
 
 impl Module {
-    pub fn new() -> Module {
-        Module {
-            types: Vec::new(),
-            funcs: Vec::new(),
-            tables: Vec::new(),
-            mems: Vec::new(),
-            globals: Vec::new(),
-            elems: Vec::new(),
-            datas: Vec::new(),
-            start: None,
-            imports: Vec::new(),
-            exports: Vec::new(),
-        }
+    pub fn from_binary(bin: Vec<u8>) -> Module {
+        let bin = WasmBinary::from(bin.into_boxed_slice());
+        let mut parse = ParsingData::new(&bin);
+        Module::parse(&mut parse).unwrap()
     }
 }

@@ -5,13 +5,13 @@ use super::{
     values::Name,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Export {
     pub name: Name,
     pub desc: ExportDesc,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ExportDesc {
     Func(FuncIdx),
     Table(TableIdx),

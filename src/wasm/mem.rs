@@ -2,7 +2,7 @@
 
 use super::types::MemType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Mem {
     pub tpe: MemType,
 }
