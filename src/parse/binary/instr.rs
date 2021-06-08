@@ -386,14 +386,12 @@ impl Parse for Block {
 
 impl Parse for IfElseBlock {
     fn parse(data: &mut ParsingData) -> Result<Self, ParseError> {
-        println!("Parsing if else");
         let tpe = BlockType::parse(data)?;
         let mut if_br = Vec::new();
         let mut else_br = Vec::new();
         loop {
             match data.read(()) {
                 0x0B => {
-                    println!("Finished with if");
                     data.consume(());
                     return Ok(IfElseBlock {
                         tpe,
@@ -402,13 +400,11 @@ impl Parse for IfElseBlock {
                     });
                 }
                 0x05 => {
-                    println!("Found else");
                     data.consume(());
                     break;
                 }
                 _ => {
                     if_br.push(Instr::parse(data)?);
-                    println!("Consuming instr: {:?}", if_br.last());
                 }
             }
         }
@@ -416,7 +412,6 @@ impl Parse for IfElseBlock {
         loop {
             match data.read(()) {
                 0x0B => {
-                    println!("Finished with else");
                     data.consume(());
                     return Ok(IfElseBlock {
                         tpe,
@@ -426,7 +421,6 @@ impl Parse for IfElseBlock {
                 }
                 _ => {
                     else_br.push(Instr::parse(data)?);
-                    println!("Consuming instr: {:?}", else_br.last());
                 }
             }
         }
